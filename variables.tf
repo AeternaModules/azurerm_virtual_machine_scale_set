@@ -118,14 +118,14 @@ EOT
     name                         = string
     resource_group_name          = string
     upgrade_policy_mode          = string
-    automatic_os_upgrade         = optional(bool, false)
+    automatic_os_upgrade         = optional(bool) # Default: false
     eviction_policy              = optional(string)
     health_probe_id              = optional(string)
     license_type                 = optional(string)
-    overprovision                = optional(bool, true)
+    overprovision                = optional(bool) # Default: true
     priority                     = optional(string)
     proximity_placement_group_id = optional(string)
-    single_placement_group       = optional(bool, true)
+    single_placement_group       = optional(bool) # Default: true
     tags                         = optional(map(string))
     zones                        = optional(list(string))
     network_profile = object({
@@ -147,7 +147,7 @@ EOT
         }))
         subnet_id = string
       })
-      ip_forwarding             = optional(bool, false)
+      ip_forwarding             = optional(bool) # Default: false
       name                      = string
       network_security_group_id = optional(string)
       primary                   = bool
@@ -173,7 +173,7 @@ EOT
       vhd_containers    = optional(set(string))
     })
     boot_diagnostics = optional(object({
-      enabled     = optional(bool, true)
+      enabled     = optional(bool) # Default: true
       storage_uri = string
     }))
     extension = optional(object({
@@ -191,7 +191,7 @@ EOT
       type         = string
     }))
     os_profile_linux_config = optional(object({
-      disable_password_authentication = optional(bool, false)
+      disable_password_authentication = optional(bool) # Default: false
       ssh_keys = optional(object({
         key_data = optional(string)
         path     = string
@@ -224,10 +224,10 @@ EOT
       publisher = string
     }))
     rolling_upgrade_policy = optional(object({
-      max_batch_instance_percent              = optional(number, 20)
-      max_unhealthy_instance_percent          = optional(number, 20)
-      max_unhealthy_upgraded_instance_percent = optional(number, 20)
-      pause_time_between_batches              = optional(string, "PT0S")
+      max_batch_instance_percent              = optional(number) # Default: 20
+      max_unhealthy_instance_percent          = optional(number) # Default: 20
+      max_unhealthy_upgraded_instance_percent = optional(number) # Default: 20
+      pause_time_between_batches              = optional(string) # Default: "PT0S"
     }))
     storage_profile_data_disk = optional(object({
       caching           = optional(string)
