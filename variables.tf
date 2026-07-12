@@ -128,12 +128,12 @@ EOT
     single_placement_group       = optional(bool) # Default: true
     tags                         = optional(map(string))
     zones                        = optional(list(string))
-    network_profile = object({
+    network_profile = list(object({
       accelerated_networking = optional(bool)
       dns_settings = optional(object({
         dns_servers = list(string)
       }))
-      ip_configuration = object({
+      ip_configuration = list(object({
         application_gateway_backend_address_pool_ids = optional(set(string))
         application_security_group_ids               = optional(set(string))
         load_balancer_backend_address_pool_ids       = optional(set(string))
@@ -146,12 +146,12 @@ EOT
           name              = string
         }))
         subnet_id = string
-      })
+      }))
       ip_forwarding             = optional(bool) # Default: false
       name                      = string
       network_security_group_id = optional(string)
       primary                   = bool
-    })
+    }))
     os_profile = object({
       admin_password       = optional(string)
       admin_username       = string
@@ -176,7 +176,7 @@ EOT
       enabled     = optional(bool) # Default: true
       storage_uri = string
     }))
-    extension = optional(object({
+    extension = optional(list(object({
       auto_upgrade_minor_version = optional(bool)
       name                       = string
       protected_settings         = optional(string)
@@ -185,38 +185,38 @@ EOT
       settings                   = optional(string)
       type                       = string
       type_handler_version       = string
-    }))
+    })))
     identity = optional(object({
       identity_ids = optional(set(string))
       type         = string
     }))
     os_profile_linux_config = optional(object({
       disable_password_authentication = optional(bool) # Default: false
-      ssh_keys = optional(object({
+      ssh_keys = optional(list(object({
         key_data = optional(string)
         path     = string
-      }))
+      })))
     }))
-    os_profile_secrets = optional(object({
+    os_profile_secrets = optional(list(object({
       source_vault_id = string
-      vault_certificates = optional(object({
+      vault_certificates = optional(list(object({
         certificate_store = optional(string)
         certificate_url   = string
-      }))
-    }))
+      })))
+    })))
     os_profile_windows_config = optional(object({
-      additional_unattend_config = optional(object({
+      additional_unattend_config = optional(list(object({
         component    = string
         content      = string
         pass         = string
         setting_name = string
-      }))
+      })))
       enable_automatic_upgrades = optional(bool)
       provision_vm_agent        = optional(bool)
-      winrm = optional(object({
+      winrm = optional(list(object({
         certificate_url = optional(string)
         protocol        = string
-      }))
+      })))
     }))
     plan = optional(object({
       name      = string
@@ -229,13 +229,13 @@ EOT
       max_unhealthy_upgraded_instance_percent = optional(number) # Default: 20
       pause_time_between_batches              = optional(string) # Default: "PT0S"
     }))
-    storage_profile_data_disk = optional(object({
+    storage_profile_data_disk = optional(list(object({
       caching           = optional(string)
       create_option     = string
       disk_size_gb      = optional(number)
       lun               = number
       managed_disk_type = optional(string)
-    }))
+    })))
     storage_profile_image_reference = optional(object({
       id        = optional(string)
       offer     = optional(string)
@@ -244,130 +244,13 @@ EOT
       version   = optional(string)
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        length(v.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.zones == null || (length(v.zones) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        length(v.sku.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.sku.capacity >= 0
-      )
-    ])
-    error_message = "must be at least 0"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.license_type == null || (contains(["Windows_Client", "Windows_Server"], v.license_type))
-      )
-    ])
-    error_message = "must be one of: Windows_Client, Windows_Server"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_batch_instance_percent == null || (v.rolling_upgrade_policy.max_batch_instance_percent >= 5 && v.rolling_upgrade_policy.max_batch_instance_percent <= 100))
-      )
-    ])
-    error_message = "must be between 5 and 100"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_unhealthy_instance_percent == null || (v.rolling_upgrade_policy.max_unhealthy_instance_percent >= 5 && v.rolling_upgrade_policy.max_unhealthy_instance_percent <= 100))
-      )
-    ])
-    error_message = "must be between 5 and 100"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent == null || (v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent >= 5 && v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent <= 100))
-      )
-    ])
-    error_message = "must be between 5 and 100"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        length(v.os_profile.admin_username) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.os_profile.admin_password == null || (length(v.os_profile.admin_password) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        length(v.network_profile.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.network_profile.dns_settings == null || (length(v.network_profile.dns_settings.dns_servers) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        length(v.network_profile.ip_configuration.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.network_profile.ip_configuration.public_ip_address_configuration == null || (v.network_profile.ip_configuration.public_ip_address_configuration.idle_timeout >= 4 && v.network_profile.ip_configuration.public_ip_address_configuration.idle_timeout <= 32)
-      )
-    ])
-    error_message = "must be between 4 and 32"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.virtual_machine_scale_sets : (
-        v.extension == null || (v.extension.provision_after_extensions == null || (length(v.extension.provision_after_extensions) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_virtual_machine_scale_set's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: location
   #   source:    location.EnhancedValidate: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
   # path: resource_group_name
@@ -384,18 +267,39 @@ EOT
   #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
   # path: resource_group_name
   #   source:    [from resourcegroups.ValidateName] !matched
+  # path: zones[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: identity.type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: identity.identity_ids[*]
   #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
   # path: identity.identity_ids[*]
   #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
+  # path: sku.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: sku.capacity
+  #   condition: value >= 0
+  #   message:   must be at least 0
+  # path: license_type
+  #   condition: contains(["Windows_Client", "Windows_Server"], value)
+  #   message:   must be one of: Windows_Client, Windows_Server
   # path: upgrade_policy_mode
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: health_probe_id
   #   source:    [from azure.ValidateResourceID] !ok
   # path: health_probe_id
   #   source:    [from azure.ValidateResourceID] err != nil
+  # path: rolling_upgrade_policy.max_batch_instance_percent
+  #   condition: value >= 5 && value <= 100
+  #   message:   must be between 5 and 100
+  # path: rolling_upgrade_policy.max_unhealthy_instance_percent
+  #   condition: value >= 5 && value <= 100
+  #   message:   must be between 5 and 100
+  # path: rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent
+  #   condition: value >= 5 && value <= 100
+  #   message:   must be between 5 and 100
   # path: rolling_upgrade_policy.pause_time_between_batches
   #   source:    [from validate.ISO8601Duration] !ok
   # path: rolling_upgrade_policy.pause_time_between_batches
@@ -404,14 +308,29 @@ EOT
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: eviction_policy
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: os_profile.admin_username
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: os_profile.admin_password
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: os_profile_secrets.source_vault_id
   #   source:    [from azure.ValidateResourceID] !ok
   # path: os_profile_secrets.source_vault_id
   #   source:    [from azure.ValidateResourceID] err != nil
+  # path: network_profile.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: network_profile.network_security_group_id
   #   source:    [from azure.ValidateResourceID] !ok
   # path: network_profile.network_security_group_id
   #   source:    [from azure.ValidateResourceID] err != nil
+  # path: network_profile.dns_settings.dns_servers[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: network_profile.ip_configuration.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: network_profile.ip_configuration.subnet_id
   #   source:    [from azure.ValidateResourceID] !ok
   # path: network_profile.ip_configuration.subnet_id
@@ -420,12 +339,18 @@ EOT
   #   source:    [from azure.ValidateResourceID] !ok
   # path: network_profile.ip_configuration.application_security_group_ids[*]
   #   source:    [from azure.ValidateResourceID] err != nil
+  # path: network_profile.ip_configuration.public_ip_address_configuration.idle_timeout
+  #   condition: value >= 4 && value <= 32
+  #   message:   must be between 4 and 32
   # path: storage_profile_os_disk.managed_disk_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: storage_profile_data_disk.disk_size_gb
   #   source:    [from validate2.DiskSizeGB] value < 0 || value > 32767
   # path: storage_profile_data_disk.managed_disk_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: extension.provision_after_extensions[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: extension.settings
   #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
   # path: extension.protected_settings

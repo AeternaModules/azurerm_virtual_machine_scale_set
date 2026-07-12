@@ -16,35 +16,41 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
   tags                         = each.value.tags
   zones                        = each.value.zones
 
-  network_profile {
-    accelerated_networking = each.value.network_profile.accelerated_networking
-    dynamic "dns_settings" {
-      for_each = each.value.network_profile.dns_settings != null ? [each.value.network_profile.dns_settings] : []
-      content {
-        dns_servers = dns_settings.value.dns_servers
-      }
-    }
-    ip_configuration {
-      application_gateway_backend_address_pool_ids = each.value.network_profile.ip_configuration.application_gateway_backend_address_pool_ids
-      application_security_group_ids               = each.value.network_profile.ip_configuration.application_security_group_ids
-      load_balancer_backend_address_pool_ids       = each.value.network_profile.ip_configuration.load_balancer_backend_address_pool_ids
-      load_balancer_inbound_nat_rules_ids          = each.value.network_profile.ip_configuration.load_balancer_inbound_nat_rules_ids
-      name                                         = each.value.network_profile.ip_configuration.name
-      primary                                      = each.value.network_profile.ip_configuration.primary
-      dynamic "public_ip_address_configuration" {
-        for_each = each.value.network_profile.ip_configuration.public_ip_address_configuration != null ? [each.value.network_profile.ip_configuration.public_ip_address_configuration] : []
+  dynamic "network_profile" {
+    for_each = each.value.network_profile
+    content {
+      accelerated_networking = network_profile.value.accelerated_networking
+      dynamic "dns_settings" {
+        for_each = network_profile.value.dns_settings != null ? [network_profile.value.dns_settings] : []
         content {
-          domain_name_label = public_ip_address_configuration.value.domain_name_label
-          idle_timeout      = public_ip_address_configuration.value.idle_timeout
-          name              = public_ip_address_configuration.value.name
+          dns_servers = dns_settings.value.dns_servers
         }
       }
-      subnet_id = each.value.network_profile.ip_configuration.subnet_id
+      dynamic "ip_configuration" {
+        for_each = network_profile.value.ip_configuration
+        content {
+          application_gateway_backend_address_pool_ids = ip_configuration.value.application_gateway_backend_address_pool_ids
+          application_security_group_ids               = ip_configuration.value.application_security_group_ids
+          load_balancer_backend_address_pool_ids       = ip_configuration.value.load_balancer_backend_address_pool_ids
+          load_balancer_inbound_nat_rules_ids          = ip_configuration.value.load_balancer_inbound_nat_rules_ids
+          name                                         = ip_configuration.value.name
+          primary                                      = ip_configuration.value.primary
+          dynamic "public_ip_address_configuration" {
+            for_each = ip_configuration.value.public_ip_address_configuration != null ? [ip_configuration.value.public_ip_address_configuration] : []
+            content {
+              domain_name_label = public_ip_address_configuration.value.domain_name_label
+              idle_timeout      = public_ip_address_configuration.value.idle_timeout
+              name              = public_ip_address_configuration.value.name
+            }
+          }
+          subnet_id = ip_configuration.value.subnet_id
+        }
+      }
+      ip_forwarding             = network_profile.value.ip_forwarding
+      name                      = network_profile.value.name
+      network_security_group_id = network_profile.value.network_security_group_id
+      primary                   = network_profile.value.primary
     }
-    ip_forwarding             = each.value.network_profile.ip_forwarding
-    name                      = each.value.network_profile.name
-    network_security_group_id = each.value.network_profile.network_security_group_id
-    primary                   = each.value.network_profile.primary
   }
 
   os_profile {
@@ -79,7 +85,7 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
   }
 
   dynamic "extension" {
-    for_each = each.value.extension != null ? [each.value.extension] : []
+    for_each = each.value.extension != null ? each.value.extension : []
     content {
       auto_upgrade_minor_version = extension.value.auto_upgrade_minor_version
       name                       = extension.value.name
@@ -105,7 +111,7 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
     content {
       disable_password_authentication = os_profile_linux_config.value.disable_password_authentication
       dynamic "ssh_keys" {
-        for_each = os_profile_linux_config.value.ssh_keys != null ? [os_profile_linux_config.value.ssh_keys] : []
+        for_each = os_profile_linux_config.value.ssh_keys != null ? os_profile_linux_config.value.ssh_keys : []
         content {
           key_data = ssh_keys.value.key_data
           path     = ssh_keys.value.path
@@ -115,11 +121,11 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
   }
 
   dynamic "os_profile_secrets" {
-    for_each = each.value.os_profile_secrets != null ? [each.value.os_profile_secrets] : []
+    for_each = each.value.os_profile_secrets != null ? each.value.os_profile_secrets : []
     content {
       source_vault_id = os_profile_secrets.value.source_vault_id
       dynamic "vault_certificates" {
-        for_each = os_profile_secrets.value.vault_certificates != null ? [os_profile_secrets.value.vault_certificates] : []
+        for_each = os_profile_secrets.value.vault_certificates != null ? os_profile_secrets.value.vault_certificates : []
         content {
           certificate_store = vault_certificates.value.certificate_store
           certificate_url   = vault_certificates.value.certificate_url
@@ -132,7 +138,7 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
     for_each = each.value.os_profile_windows_config != null ? [each.value.os_profile_windows_config] : []
     content {
       dynamic "additional_unattend_config" {
-        for_each = os_profile_windows_config.value.additional_unattend_config != null ? [os_profile_windows_config.value.additional_unattend_config] : []
+        for_each = os_profile_windows_config.value.additional_unattend_config != null ? os_profile_windows_config.value.additional_unattend_config : []
         content {
           component    = additional_unattend_config.value.component
           content      = additional_unattend_config.value.content
@@ -143,7 +149,7 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
       enable_automatic_upgrades = os_profile_windows_config.value.enable_automatic_upgrades
       provision_vm_agent        = os_profile_windows_config.value.provision_vm_agent
       dynamic "winrm" {
-        for_each = os_profile_windows_config.value.winrm != null ? [os_profile_windows_config.value.winrm] : []
+        for_each = os_profile_windows_config.value.winrm != null ? os_profile_windows_config.value.winrm : []
         content {
           certificate_url = winrm.value.certificate_url
           protocol        = winrm.value.protocol
@@ -172,7 +178,7 @@ resource "azurerm_virtual_machine_scale_set" "virtual_machine_scale_sets" {
   }
 
   dynamic "storage_profile_data_disk" {
-    for_each = each.value.storage_profile_data_disk != null ? [each.value.storage_profile_data_disk] : []
+    for_each = each.value.storage_profile_data_disk != null ? each.value.storage_profile_data_disk : []
     content {
       caching           = storage_profile_data_disk.value.caching
       create_option     = storage_profile_data_disk.value.create_option
