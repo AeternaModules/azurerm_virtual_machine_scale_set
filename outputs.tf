@@ -1,3 +1,7 @@
+output "virtual_machine_scale_sets_id" {
+  description = "Map of id values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.id }
+}
 output "virtual_machine_scale_sets_automatic_os_upgrade" {
   description = "Map of automatic_os_upgrade values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
   value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.automatic_os_upgrade }
