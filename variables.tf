@@ -260,130 +260,174 @@ EOT
     ])
     error_message = "Each ip_configuration list must contain at least 1 items"
   }
-  # --- Unconfirmed validation candidates, derived from azurerm_virtual_machine_scale_set's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: location
-  #   source:    location.EnhancedValidate: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: resource_group_name
-  #   condition: length(value) <= 90
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  # path: resource_group_name
-  #   condition: !endswith(value, ".")
-  #   message:   [from resourcegroups.ValidateName: must not end with "."]
-  #   source:    [from resourcegroups.ValidateName: must not end with "."]
-  # path: resource_group_name
-  #   condition: length(value) != 0
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  # path: resource_group_name
-  #   source:    [from resourcegroups.ValidateName] !matched
-  # path: zones[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: identity.type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: identity.identity_ids[*]
-  #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
-  # path: identity.identity_ids[*]
-  #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
-  # path: sku.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: sku.capacity
-  #   condition: value >= 0
-  #   message:   must be at least 0
-  # path: license_type
-  #   condition: contains(["Windows_Client", "Windows_Server"], value)
-  #   message:   must be one of: Windows_Client, Windows_Server
-  # path: upgrade_policy_mode
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: health_probe_id
-  #   source:    [from azure.ValidateResourceID] !ok
-  # path: health_probe_id
-  #   source:    [from azure.ValidateResourceID] err != nil
-  # path: rolling_upgrade_policy.max_batch_instance_percent
-  #   condition: value >= 5 && value <= 100
-  #   message:   must be between 5 and 100
-  # path: rolling_upgrade_policy.max_unhealthy_instance_percent
-  #   condition: value >= 5 && value <= 100
-  #   message:   must be between 5 and 100
-  # path: rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent
-  #   condition: value >= 5 && value <= 100
-  #   message:   must be between 5 and 100
-  # path: rolling_upgrade_policy.pause_time_between_batches
-  #   source:    [from validate.ISO8601Duration] !ok
-  # path: rolling_upgrade_policy.pause_time_between_batches
-  #   source:    [from validate.ISO8601Duration] err != nil
-  # path: priority
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: eviction_policy
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: os_profile.admin_username
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: os_profile.admin_password
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: os_profile_secrets.source_vault_id
-  #   source:    [from azure.ValidateResourceID] !ok
-  # path: os_profile_secrets.source_vault_id
-  #   source:    [from azure.ValidateResourceID] err != nil
-  # path: network_profile.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: network_profile.network_security_group_id
-  #   source:    [from azure.ValidateResourceID] !ok
-  # path: network_profile.network_security_group_id
-  #   source:    [from azure.ValidateResourceID] err != nil
-  # path: network_profile.dns_settings.dns_servers[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: network_profile.ip_configuration.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: network_profile.ip_configuration.subnet_id
-  #   source:    [from azure.ValidateResourceID] !ok
-  # path: network_profile.ip_configuration.subnet_id
-  #   source:    [from azure.ValidateResourceID] err != nil
-  # path: network_profile.ip_configuration.application_security_group_ids[*]
-  #   source:    [from azure.ValidateResourceID] !ok
-  # path: network_profile.ip_configuration.application_security_group_ids[*]
-  #   source:    [from azure.ValidateResourceID] err != nil
-  # path: network_profile.ip_configuration.public_ip_address_configuration.idle_timeout
-  #   condition: value >= 4 && value <= 32
-  #   message:   must be between 4 and 32
-  # path: storage_profile_os_disk.managed_disk_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: storage_profile_data_disk.disk_size_gb
-  #   source:    [from validate2.DiskSizeGB] value < 0 || value > 32767
-  # path: storage_profile_data_disk.managed_disk_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: extension.provision_after_extensions[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: extension.settings
-  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
-  # path: extension.protected_settings
-  #   source:    validation.StringIsJSON(...) - no translation rule yet, add one
-  # path: tags
-  #   condition: length(value) <= 50
-  #   message:   [from tags.Validate: invalid when len(value) > 50]
-  #   source:    [from tags.Validate: invalid when len(value) > 50]
-  # path: tags
-  #   condition: length(value) <= 512
-  #   message:   [from tags.Validate: invalid when len(value) > 512]
-  #   source:    [from tags.Validate: invalid when len(value) > 512]
-  # path: tags
-  #   source:    [from tags.Validate] err != nil
-  # path: tags
-  #   condition: length(value) <= 256
-  #   message:   [from tags.Validate: invalid when len(value) > 256]
-  #   source:    [from tags.Validate: invalid when len(value) > 256]
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.resource_group_name) <= 90
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) > 90]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        !endswith(v.resource_group_name, ".")
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: must not end with \".\"]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.resource_group_name) != 0
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) == 0]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.zones == null || (alltrue([for x in v.zones : length(x) > 0]))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.sku.name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.sku.capacity >= 0
+      )
+    ])
+    error_message = "must be at least 0"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.license_type == null || (contains(["Windows_Client", "Windows_Server"], v.license_type))
+      )
+    ])
+    error_message = "must be one of: Windows_Client, Windows_Server"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_batch_instance_percent == null || (v.rolling_upgrade_policy.max_batch_instance_percent >= 5 && v.rolling_upgrade_policy.max_batch_instance_percent <= 100))
+      )
+    ])
+    error_message = "must be between 5 and 100"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_unhealthy_instance_percent == null || (v.rolling_upgrade_policy.max_unhealthy_instance_percent >= 5 && v.rolling_upgrade_policy.max_unhealthy_instance_percent <= 100))
+      )
+    ])
+    error_message = "must be between 5 and 100"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.rolling_upgrade_policy == null || (v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent == null || (v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent >= 5 && v.rolling_upgrade_policy.max_unhealthy_upgraded_instance_percent <= 100))
+      )
+    ])
+    error_message = "must be between 5 and 100"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.os_profile.admin_username) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.os_profile.admin_password == null || (length(v.os_profile.admin_password) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        alltrue([for item in v.network_profile : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        alltrue([for item in v.network_profile : (item.dns_settings == null || (alltrue([for x in item.dns_settings.dns_servers : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        alltrue([for item in v.network_profile : (alltrue([for item in item.ip_configuration : (length(item.name) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        alltrue([for item in v.network_profile : (alltrue([for item in item.ip_configuration : (item.public_ip_address_configuration == null || (item.public_ip_address_configuration.idle_timeout >= 4 && item.public_ip_address_configuration.idle_timeout <= 32))]))])
+      )
+    ])
+    error_message = "must be between 4 and 32"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.extension == null || alltrue([for item in v.extension : (item.provision_after_extensions == null || (alltrue([for x in item.provision_after_extensions : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.extension == null || alltrue([for item in v.extension : (item.settings == null || (can(jsondecode(item.settings))))])
+      )
+    ])
+    error_message = "must be valid JSON"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.extension == null || alltrue([for item in v.extension : (item.protected_settings == null || (can(jsondecode(item.protected_settings))))])
+      )
+    ])
+    error_message = "must be valid JSON"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        v.tags == null || (length(v.tags) <= 50)
+      )
+    ])
+    error_message = "[from tags.Validate: invalid when len(value) > 50]"
+  }
+  # Note: 26 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
