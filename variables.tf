@@ -118,14 +118,14 @@ EOT
     name                         = string
     resource_group_name          = string
     upgrade_policy_mode          = string
-    automatic_os_upgrade         = optional(bool) # Default: false
+    automatic_os_upgrade         = optional(bool)
     eviction_policy              = optional(string)
     health_probe_id              = optional(string)
     license_type                 = optional(string)
-    overprovision                = optional(bool) # Default: true
+    overprovision                = optional(bool)
     priority                     = optional(string)
     proximity_placement_group_id = optional(string)
-    single_placement_group       = optional(bool) # Default: true
+    single_placement_group       = optional(bool)
     tags                         = optional(map(string))
     zones                        = optional(list(string))
     network_profile = list(object({
@@ -147,7 +147,7 @@ EOT
         }))
         subnet_id = string
       }))
-      ip_forwarding             = optional(bool) # Default: false
+      ip_forwarding             = optional(bool)
       name                      = string
       network_security_group_id = optional(string)
       primary                   = bool
@@ -173,7 +173,7 @@ EOT
       vhd_containers    = optional(set(string))
     })
     boot_diagnostics = optional(object({
-      enabled     = optional(bool) # Default: true
+      enabled     = optional(bool)
       storage_uri = string
     }))
     extension = optional(list(object({
@@ -191,7 +191,7 @@ EOT
       type         = string
     }))
     os_profile_linux_config = optional(object({
-      disable_password_authentication = optional(bool) # Default: false
+      disable_password_authentication = optional(bool)
       ssh_keys = optional(list(object({
         key_data = optional(string)
         path     = string
@@ -224,10 +224,10 @@ EOT
       publisher = string
     }))
     rolling_upgrade_policy = optional(object({
-      max_batch_instance_percent              = optional(number) # Default: 20
-      max_unhealthy_instance_percent          = optional(number) # Default: 20
-      max_unhealthy_upgraded_instance_percent = optional(number) # Default: 20
-      pause_time_between_batches              = optional(string) # Default: "PT0S"
+      max_batch_instance_percent              = optional(number)
+      max_unhealthy_instance_percent          = optional(number)
+      max_unhealthy_upgraded_instance_percent = optional(number)
+      pause_time_between_batches              = optional(string)
     }))
     storage_profile_data_disk = optional(list(object({
       caching           = optional(string)
@@ -244,6 +244,22 @@ EOT
       version   = optional(string)
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        length(v.network_profile) >= 1
+      )
+    ])
+    error_message = "Each network_profile list must contain at least 1 items"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
+        alltrue([for item in v.network_profile : (length(item.ip_configuration) >= 1)])
+      )
+    ])
+    error_message = "Each ip_configuration list must contain at least 1 items"
+  }
   # --- Unconfirmed validation candidates, derived from azurerm_virtual_machine_scale_set's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
