@@ -8,7 +8,7 @@ output "virtual_machine_scale_sets_automatic_os_upgrade" {
 }
 output "virtual_machine_scale_sets_boot_diagnostics" {
   description = "Map of boot_diagnostics values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.boot_diagnostics if v.boot_diagnostics != null && length(v.boot_diagnostics) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.boot_diagnostics) if v.boot_diagnostics != null && length(v.boot_diagnostics) > 0 }
 }
 output "virtual_machine_scale_sets_eviction_policy" {
   description = "Map of eviction_policy values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -25,7 +25,7 @@ output "virtual_machine_scale_sets_health_probe_id" {
 }
 output "virtual_machine_scale_sets_identity" {
   description = "Map of identity values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.identity if v.identity != null && length(v.identity) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.identity) if v.identity != null && length(v.identity) > 0 }
 }
 output "virtual_machine_scale_sets_license_type" {
   description = "Map of license_type values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -45,12 +45,12 @@ output "virtual_machine_scale_sets_network_profile" {
 }
 output "virtual_machine_scale_sets_os_profile" {
   description = "Map of os_profile values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.os_profile if v.os_profile != null && length(v.os_profile) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.os_profile) if v.os_profile != null && length(v.os_profile) > 0 }
   sensitive   = true
 }
 output "virtual_machine_scale_sets_os_profile_linux_config" {
   description = "Map of os_profile_linux_config values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.os_profile_linux_config if v.os_profile_linux_config != null && length(v.os_profile_linux_config) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.os_profile_linux_config) if v.os_profile_linux_config != null && length(v.os_profile_linux_config) > 0 }
 }
 output "virtual_machine_scale_sets_os_profile_secrets" {
   description = "Map of os_profile_secrets values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -58,7 +58,7 @@ output "virtual_machine_scale_sets_os_profile_secrets" {
 }
 output "virtual_machine_scale_sets_os_profile_windows_config" {
   description = "Map of os_profile_windows_config values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.os_profile_windows_config if v.os_profile_windows_config != null && length(v.os_profile_windows_config) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.os_profile_windows_config) if v.os_profile_windows_config != null && length(v.os_profile_windows_config) > 0 }
   sensitive   = true
 }
 output "virtual_machine_scale_sets_overprovision" {
@@ -67,7 +67,7 @@ output "virtual_machine_scale_sets_overprovision" {
 }
 output "virtual_machine_scale_sets_plan" {
   description = "Map of plan values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.plan if v.plan != null && length(v.plan) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.plan) if v.plan != null && length(v.plan) > 0 }
 }
 output "virtual_machine_scale_sets_priority" {
   description = "Map of priority values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -83,7 +83,7 @@ output "virtual_machine_scale_sets_resource_group_name" {
 }
 output "virtual_machine_scale_sets_rolling_upgrade_policy" {
   description = "Map of rolling_upgrade_policy values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.rolling_upgrade_policy if v.rolling_upgrade_policy != null && length(v.rolling_upgrade_policy) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.rolling_upgrade_policy) if v.rolling_upgrade_policy != null && length(v.rolling_upgrade_policy) > 0 }
 }
 output "virtual_machine_scale_sets_single_placement_group" {
   description = "Map of single_placement_group values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -91,7 +91,7 @@ output "virtual_machine_scale_sets_single_placement_group" {
 }
 output "virtual_machine_scale_sets_sku" {
   description = "Map of sku values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.sku if v.sku != null && length(v.sku) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.sku) if v.sku != null && length(v.sku) > 0 }
 }
 output "virtual_machine_scale_sets_storage_profile_data_disk" {
   description = "Map of storage_profile_data_disk values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
@@ -99,11 +99,11 @@ output "virtual_machine_scale_sets_storage_profile_data_disk" {
 }
 output "virtual_machine_scale_sets_storage_profile_image_reference" {
   description = "Map of storage_profile_image_reference values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.storage_profile_image_reference if v.storage_profile_image_reference != null && length(v.storage_profile_image_reference) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.storage_profile_image_reference) if v.storage_profile_image_reference != null && length(v.storage_profile_image_reference) > 0 }
 }
 output "virtual_machine_scale_sets_storage_profile_os_disk" {
   description = "Map of storage_profile_os_disk values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
-  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => v.storage_profile_os_disk if v.storage_profile_os_disk != null && length(v.storage_profile_os_disk) > 0 }
+  value       = { for k, v in azurerm_virtual_machine_scale_set.virtual_machine_scale_sets : k => one(v.storage_profile_os_disk) if v.storage_profile_os_disk != null && length(v.storage_profile_os_disk) > 0 }
 }
 output "virtual_machine_scale_sets_tags" {
   description = "Map of tags values across all virtual_machine_scale_sets, keyed the same as var.virtual_machine_scale_sets"
